@@ -77,7 +77,7 @@
     <div class="stat"><span class="dot d-none"></span><b id="tTotal">0</b><span>Equipos en total</span></div>
   </div>
   <div class="grid" id="grid"></div>
-  <p class="note">Pincha en el vídeo para verlo con sonido y en el resto de la tarjeta para entrar en el aula. Los resúmenes muestran las anotaciones guardadas en este navegador.</p>
+  <p class="note">Pasa el ratón por una tarjeta para ver su vídeo y pincha en cualquier parte de ella para entrar en el aula. Los resúmenes muestran las anotaciones guardadas en este navegador.</p>
 </main>
 
 <script>
@@ -112,8 +112,8 @@ AULAS.forEach(a => {
   card.className = "card"; card.href = a.file;
   card.innerHTML = `
     <div class="thumb">
-      <video src="video/${a.file.replace('.html', '.mp4')}" poster="img/${a.file.replace('.html', '.jpg')}" preload="metadata" playsinline loop muted></video>
-      <span class="play">▶ Pasa el ratón o pincha</span>
+      <video src="video/${a.file.replace('.html', '.mp4')}?v=2" poster="img/${a.file.replace('.html', '.jpg')}?v=2" preload="metadata" playsinline loop muted></video>
+      <span class="play">▶ Pasa el ratón para verlo</span>
       <span class="badge">${a.total} equipos</span>
       <span class="alert ${probs ? "show" : ""}">⚠ ${probs} con problemas</span>
     </div>
@@ -156,12 +156,9 @@ btnSound.addEventListener("click", () => {
 });
 paintSound();
 document.querySelectorAll(".card").forEach(card => {
-  const v = card.querySelector("video"), thumb = card.querySelector(".thumb");
+  const v = card.querySelector("video");
   card.addEventListener("mouseenter", () => playVideo(v));
   card.addEventListener("mouseleave", () => stopVideo(v));
-  thumb.addEventListener("click", e => {          // pinchar en el vídeo: lo reproduce con sonido (no entra en el aula)
-    e.preventDefault();
-    if (v.paused || v.muted) { playVideo(v); } else { stopVideo(v); }
   });
 });
 
