@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RMI · Recursos informáticos · I.E.S. Alquipir de Cehegín</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8a3b1f">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -164,6 +169,12 @@ document.querySelectorAll(".card").forEach(card => {
 
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); } }), {threshold: .08});
 document.querySelectorAll(".card").forEach((c, i) => { c.style.transitionDelay = (i * 80) + "ms"; io.observe(c); });
+</script>
+<script>
+/* Registro del service worker: convierte la web en app instalable (PWA) */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
 </script>
 </body>
 </html>
