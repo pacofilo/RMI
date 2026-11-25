@@ -159,7 +159,6 @@ document.querySelectorAll(".card").forEach(card => {
   const v = card.querySelector("video");
   card.addEventListener("mouseenter", () => playVideo(v));
   card.addEventListener("mouseleave", () => stopVideo(v));
-  });
 });
 
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); } }), {threshold: .08});
