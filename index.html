@@ -109,7 +109,7 @@ AULAS.forEach(a => {
   T.ok += c.ok; T.warn += c.warn; T.bad += c.bad; T.total += a.total;
   const probs = c.warn + c.bad;
   const card = document.createElement("a");
-  card.className = "card"; card.href = a.file;
+  card.className = "card"; card.href = a.file + "?v=3";
   card.innerHTML = `
     <div class="thumb">
       <video src="video/${a.file.replace('.html', '.mp4')}?v=3" poster="img/${a.file.replace('.html', '.jpg')}?v=3" preload="metadata" playsinline loop muted></video>
