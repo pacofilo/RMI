@@ -3,7 +3,7 @@
    así todos los dispositivos (móvil, ordenador, app) ven y modifican lo mismo.
    El navegador conserva una copia local para abrir la web sin conexión; los cambios hechos
    sin conexión se envían solos en cuanto vuelve Internet. */
-const RMI_SYNC_URL = ""; // ← URL de la aplicación web de Apps Script (termina en /exec)
+const RMI_SYNC_URL = "https://script.google.com/macros/s/AKfycbzNCLtsFVP-rzvOGSvqrGenNeyTafOheLfenSQ_hNNS_HG6_nlS_bPVAhMjzW-YSZJ6KQ/exec"; // ← URL de la aplicación web de Apps Script (termina en /exec)
 
 const RMISync = (() => {
   const on = !!RMI_SYNC_URL;
