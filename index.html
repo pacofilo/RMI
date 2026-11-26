@@ -74,6 +74,7 @@
   <p class="sub">Elige un aula para ver el plano de sus equipos y anotar si funcionan bien o presentan algún problema.</p>
 </header>
 
+<script src="rmi-sync.js?v=1"></script>
 <main>
   <div class="stats">
     <div class="stat"><span class="dot d-ok"></span><b id="tOk">0</b><span>Funcionan</span></div>
@@ -82,7 +83,7 @@
     <div class="stat"><span class="dot d-none"></span><b id="tTotal">0</b><span>Equipos en total</span></div>
   </div>
   <div class="grid" id="grid"></div>
-  <p class="note">Pasa el ratón por una tarjeta para ver su vídeo y pincha en cualquier parte de ella para entrar en el aula. Los resúmenes muestran las anotaciones guardadas en este navegador.</p>
+  <p class="note">Pasa el ratón por una tarjeta para ver su vídeo y pincha en cualquier parte de ella para entrar en el aula. Las anotaciones se guardan en la web y se comparten entre todos los dispositivos.</p>
 </main>
 
 <script>
@@ -114,27 +115,44 @@ AULAS.forEach(a => {
   T.ok += c.ok; T.warn += c.warn; T.bad += c.bad; T.total += a.total;
   const probs = c.warn + c.bad;
   const card = document.createElement("a");
-  card.className = "card"; card.href = a.file + "?v=3";
+  card.className = "card"; card.href = a.file + "?v=3"; card.dataset.key = a.key;
   card.innerHTML = `
     <div class="thumb">
       <video src="video/${a.file.replace('.html', '.mp4')}?v=3" poster="img/${a.file.replace('.html', '.jpg')}?v=3" preload="metadata" playsinline loop muted></video>
       <span class="play">▶ Pasa el ratón para verlo</span>
       <span class="badge">${a.total} equipos</span>
-      <span class="alert ${probs ? "show" : ""}">⚠ ${probs} con problemas</span>
+      <span class="alert ${probs ? "show" : ""}">⚠ <i class="n-probs">${probs}</i> con problemas</span>
     </div>
     <div class="body">
       <h2>${a.title}</h2>
       <p>${a.desc}</p>
       <div class="mini">
-        <span><span class="dot d-ok"></span>${c.ok} funcionan</span>
-        <span><span class="dot d-warn"></span>${c.warn} con incidencias</span>
-        <span><span class="dot d-bad"></span>${c.bad} no funcionan</span>
+        <span><span class="dot d-ok"></span><i class="n-ok">${c.ok}</i> funcionan</span>
+        <span><span class="dot d-warn"></span><i class="n-warn">${c.warn}</i> con incidencias</span>
+        <span><span class="dot d-bad"></span><i class="n-bad">${c.bad}</i> no funcionan</span>
       </div>
       <div class="go">Entrar en el aula →</div>
     </div>`;
   grid.appendChild(card);
 });
 tOk.textContent = T.ok; tWarn.textContent = T.warn; tBad.textContent = T.bad; tTotal.textContent = T.total;
+
+/* Repinta los contadores con los datos compartidos de la web */
+function paintCounts(){
+  const S = {ok: 0, warn: 0, bad: 0};
+  AULAS.forEach(a => {
+    const c = {ok: 0, warn: 0, bad: 0};
+    Object.entries(readState(a.key)).forEach(([id, v]) => { if (id !== "ARMARIO" && v && c[v.st] !== undefined) c[v.st]++; });
+    S.ok += c.ok; S.warn += c.warn; S.bad += c.bad;
+    const card = grid.querySelector(`.card[data-key="${a.key}"]`);
+    card.querySelector(".n-ok").textContent = c.ok; card.querySelector(".n-warn").textContent = c.warn;
+    card.querySelector(".n-bad").textContent = c.bad; card.querySelector(".n-probs").textContent = c.warn + c.bad;
+    card.querySelector(".alert").classList.toggle("show", c.warn + c.bad > 0);
+  });
+  tOk.textContent = S.ok; tWarn.textContent = S.warn; tBad.textContent = S.bad;
+}
+RMISync.pullAll(AULAS.map(a => a.key), paintCounts);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") RMISync.pullAll(AULAS.map(a => a.key), paintCounts); });
 
 /* ---------- Vídeos con sonido al pasar el ratón o pinchar ---------- */
 let soundOn = true;
