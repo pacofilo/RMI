@@ -63,8 +63,8 @@
   .mic[data-st="ok"]{border-color:var(--ok)} .mic[data-st="warn"]{border-color:var(--warn)} .mic[data-st="bad"]{border-color:var(--bad);color:var(--bad)}
   .micres{font-size:.85rem;color:var(--ink2);margin-top:.4rem}
   #micBox{display:none} #micBox.on{display:block}
-  .mics.n18{grid-template-columns:repeat(6,auto)}
-  @media (max-width:420px){.mics.n18{grid-template-columns:repeat(4,auto)}}
+  .mics.n18{display:flex;flex-wrap:wrap;justify-content:center;gap:.3rem}
+  .mics.n18 .mic{font-size:.72rem;padding:.1rem .45rem}
   .dev[data-id="ALTAVOZ"] img,#mImg[src*="altavoz"]{mix-blend-mode:multiply;filter:none}
   .microw{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-bottom:1px dashed var(--line)}
   .microw:last-child{border-bottom:none}
