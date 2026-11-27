@@ -39,7 +39,7 @@ const TEM_SECCIONES = [
     {cod: "AG21", nombre: "Aula de Apoyo"},
     {cod: "?4",   nombre: "Aula de Apoyo (Orientación)"},
     {cod: "ADA1", nombre: "Aula Convivencia"},
-    {cod: "AV1",  nombre: "Audiovisuales · Tutoría", equipos: ["PROF", "SMART", "PROYECTOR", "SONIDO"]},
+    {cod: "AV1",  nombre: "Audiovisuales · Tutoría", equipos: ["PROF", "PROYECTOR", "SONIDO"]},
     {cod: "?2",   nombre: "Aula Taller"},
   ]},
   {nivel: "Laboratorios", aulas: [
