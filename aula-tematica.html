@@ -54,6 +54,22 @@
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(178,58,42,.6)}50%{box-shadow:0 0 0 8px rgba(178,58,42,0)}}
   .legend{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:1.3rem;font-size:.82rem;color:var(--ink2)}
   .legend span{display:flex;align-items:center;gap:.4rem}
+  .devs.n4{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+  .dev .det{font-size:.9rem;color:var(--ink2);margin-top:.15rem}
+  /* ---------- Micrófonos (equipo de sonido) ---------- */
+  .mics{display:grid;grid-template-columns:repeat(3,auto);justify-content:center;gap:.4rem;margin-top:.7rem}
+  .dev[data-id="SONIDO"] img,#mImg[src*="1795775270665"]{mix-blend-mode:multiply;filter:none}
+  .mic{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;font-weight:600;color:var(--ink2);background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:.15rem .55rem}
+  .mic[data-st="ok"]{border-color:var(--ok)} .mic[data-st="warn"]{border-color:var(--warn)} .mic[data-st="bad"]{border-color:var(--bad);color:var(--bad)}
+  .micres{font-size:.85rem;color:var(--ink2);margin-top:.4rem}
+  #micBox{display:none} #micBox.on{display:block}
+  .microw{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-bottom:1px dashed var(--line)}
+  .microw:last-child{border-bottom:none}
+  .microw b{flex:1;font-size:.9rem;font-weight:600}
+  .microw button{font-family:inherit;font-size:.78rem;font-weight:600;border:2px solid var(--line);background:var(--paper);border-radius:999px;padding:.2rem .6rem;cursor:pointer;color:var(--ink)}
+  .microw button.sel[data-v="ok"]{border-color:var(--ok);background:#e7f1e8}
+  .microw button.sel[data-v="warn"]{border-color:var(--warn);background:#fbf0d9}
+  .microw button.sel[data-v="bad"]{border-color:var(--bad);background:#f8e1dd}
   .noexiste{text-align:center;margin-top:2rem;color:var(--ink2)}
 
   /* ---------- Ventana modal ---------- */
@@ -98,7 +114,7 @@
   <div class="eyebrow" id="nivel">Aulas temáticas</div>
   <span class="cod" id="cod"></span>
   <h1 id="titulo">Aula</h1>
-  <p class="sub">Pincha en el ordenador o en la pantalla para anotar si funciona bien o si presenta algún problema.</p>
+  <p class="sub" id="subt">Pincha en el ordenador o en la pantalla para anotar si funciona bien o si presenta algún problema.</p>
 </header>
 
 <main>
@@ -124,6 +140,10 @@
       <input type="radio" name="st" id="st-warn" value="warn"><label for="st-warn" class="s-warn"><span class="dot d-warn"></span>Con incidencias</label>
       <input type="radio" name="st" id="st-bad" value="bad"><label for="st-bad" class="s-bad"><span class="dot d-bad"></span>No funciona</label>
     </div>
+    <div id="micBox">
+      <div class="label">Micrófonos</div>
+      <div id="micList"></div>
+    </div>
     <div class="label">Anotaciones</div>
     <div class="quick" id="quick"></div>
     <textarea id="mNote" placeholder="Describe el problema…"></textarea>
@@ -140,15 +160,20 @@
 <div class="toast" id="toast"></div>
 
 <script src="rmi-sync.js?v=2"></script>
-<script src="tematicas-data.js?v=4"></script>
+<script src="tematicas-data.js?v=5"></script>
 <script>
 const COD = (new URLSearchParams(location.search).get("a") || "").toUpperCase();
 const AULA = TEM_AULAS.find(a => a.cod === COD);
+const EQS = temEquiposDe(AULA);
 const LAB = {ok: "Funciona bien", warn: "Con incidencias", bad: "No funciona", none: "Sin revisar"};
 const QUICKS = {
   PROF:  ["No enciende torre","Pantalla sin señal","Falta ratón","Falta teclado","Ratón no funciona","Teclado no funciona","Sin Internet","Va muy lento","No inicia sesión","Problema de sonido","Problema de espacio en disco duro"],
   SMART: ["No enciende","El táctil no responde","No se ve el ordenador","Sin sonido","Rotuladores no funcionan","Sin conexión a Internet","Pantalla con líneas o manchas"],
+  PROYECTOR: ["No enciende","Sin señal del ordenador","Imagen borrosa o desenfocada","Colores raros","Lámpara agotada / aviso de lámpara","Se apaga solo","Falta el mando","Ventilador muy ruidoso"],
+  SONIDO: ["No enciende","No se oye nada","Se oye con ruido o zumbido","Acopla (pitido)","Falta algún micrófono","Micrófono sin pilas","Falta el mando","Cable suelto o roto"],
 };
+const DET = {SONIDO: "Amplificador Denon"};
+const MLAB = {ok: "Funciona", warn: "Falla", bad: "No funciona"};
 const BAD = ["No enciende torre","No enciende"];
 
 if (!AULA) {
@@ -159,10 +184,12 @@ if (!AULA) {
   nivel.textContent = "Aulas temáticas · " + AULA.nivel;
   cod.textContent = AULA.cod;
   titulo.innerHTML = AULA.nombre.replace(/^(Aula de |Aula |Laboratorio de )(.+)$/, "$1<em>$2</em>").replace(/^([^<]+ · )(.+)$/, "$1<em>$2</em>");
-  TEM_EQUIPOS.forEach(e => {
+  if (EQS.length > 2) { devs.classList.add("n" + EQS.length); subt.textContent = "Pincha en cada equipo para anotar si funciona bien o si presenta algún problema."; }
+  EQS.forEach(e => {
     const b = document.createElement("button");
     b.className = "dev"; b.type = "button"; b.dataset.id = e.id;
-    b.innerHTML = `<span class="flag"></span><img src="${e.img}" alt=""><h2>${e.nombre}</h2>
+    b.innerHTML = `<span class="flag"></span><img src="${e.img}" alt=""><h2>${e.nombre}</h2>${DET[e.id] ? `<div class="det">${DET[e.id]}${e.mics ? " · " + e.mics + " micrófonos" : ""}</div>` : ""}
+      ${e.mics ? `<div class="mics">${Array.from({length: e.mics}, (_, i) => `<span class="mic" data-m="${i + 1}"><span class="dot"></span>Mic ${i + 1}</span>`).join("")}</div><div class="micres"></div>` : ""}
       <div class="st"><span class="dot"></span><span class="stt">Sin revisar</span></div><div class="nota"></div>
       <span class="act">Anotar estado →</span>`;
     b.addEventListener("click", () => openModal(e.id));
@@ -180,18 +207,23 @@ const eqOf = id => TEM_EQUIPOS.find(e => e.id === id);
 
 function refresh(){
   if (!AULA) return;
-  TEM_EQUIPOS.forEach(e => {
+  EQS.forEach(e => {
     const d = data[fid(e.id)] || {}, st = d.st || "none";
     const el = devs.querySelector(`.dev[data-id="${e.id}"]`);
     el.dataset.st = st;
     el.querySelector(".st .dot").className = "dot d-" + st;
     el.querySelector(".stt").textContent = LAB[st] + (d.date ? " · " + d.date : "");
     el.querySelector(".nota").textContent = d.note || "";
+    if (e.mics) {
+      const m = d.mics || {}; let ok = 0, rev = 0;
+      el.querySelectorAll(".mic").forEach(x => { const v = m[x.dataset.m] || "none"; x.dataset.st = v; x.querySelector(".dot").className = "dot d-" + v; if (v !== "none") rev++; if (v === "ok") ok++; });
+      el.querySelector(".micres").textContent = rev ? `Micrófonos: ${ok} de ${e.mics} funcionan bien` + (rev < e.mics ? ` (${e.mics - rev} sin revisar)` : "") : "Micrófonos sin revisar";
+    }
   });
 }
 
 /* ---------- Ventana ---------- */
-let current = null;
+let current = null, micState = {};
 function openModal(id){
   current = id; const e = eqOf(id), d = data[fid(id)] || {};
   mTitle.textContent = e.nombre; mSub.textContent = AULA.cod + " · " + AULA.nombre; mImg.src = e.img;
@@ -204,6 +236,18 @@ function openModal(id){
     quick.appendChild(b);
   });
   document.querySelectorAll("input[name=st]").forEach(r => r.checked = r.value === d.st);
+  micState = Object.assign({}, d.mics || {});
+  micBox.classList.toggle("on", !!e.mics);
+  micList.innerHTML = "";
+  for (let i = 1; i <= (e.mics || 0); i++) {
+    const row = document.createElement("div"); row.className = "microw";
+    row.innerHTML = `<b>Micrófono ${i}</b>` + ["ok", "warn", "bad"].map(v => `<button type="button" data-v="${v}">${MLAB[v]}</button>`).join("");
+    const paint = () => row.querySelectorAll("button").forEach(x => x.classList.toggle("sel", micState[i] === x.dataset.v));
+    row.querySelectorAll("button").forEach(x => x.onclick = () => { if (micState[i] === x.dataset.v) delete micState[i]; else micState[i] = x.dataset.v;
+      if (micState[i] && micState[i] !== "ok" && !document.querySelector("input[name=st]:checked")) document.getElementById("st-warn").checked = true;
+      paint(); });
+    paint(); micList.appendChild(row);
+  }
   mNote.value = d.note || ""; mWho.value = d.who || lsGet("infortec-who");
   mMeta.textContent = d.date ? "Última actualización: " + d.date : "Aún no hay anotaciones.";
   overlay.classList.add("open");
@@ -215,8 +259,10 @@ function lsGet(k){ try { return localStorage.getItem(k) || ""; } catch (e) { ret
 mSave.onclick = () => {
   const st = (document.querySelector("input[name=st]:checked") || {}).value || "";
   const note = mNote.value.trim(), who = mWho.value.trim();
-  if (!st && !note) delete data[fid(current)];
-  else data[fid(current)] = {st, note, who, date: new Date().toLocaleString("es-ES", {dateStyle: "short", timeStyle: "short"})};
+  const hasMics = eqOf(current).mics && Object.keys(micState).length;
+  if (!st && !note && !hasMics) delete data[fid(current)];
+  else { data[fid(current)] = {st, note, who, date: new Date().toLocaleString("es-ES", {dateStyle: "short", timeStyle: "short"})};
+         if (hasMics) data[fid(current)].mics = micState; }
   try { if (who) localStorage.setItem("infortec-who", who); } catch (e) {}
   const name = eqOf(current).nombre;
   persist(); refresh(); toast(name + " guardado"); closeModal();
