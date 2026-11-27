@@ -1,5 +1,6 @@
 /* RMI · Aulas temáticas: lista de aulas agrupadas por nivel (de menor a mayor).
-   Cada aula tiene dos equipos que se revisan: el ordenador del profesorado y la pantalla SMART. */
+   Cada aula tiene por defecto dos equipos que se revisan: el ordenador del profesorado y la pantalla SMART.
+   Un aula puede llevar su propia lista de equipos con "equipos: [...]" (p. ej., AV1). */
 const TEM_KEY = "tematicas-estado-v1";
 
 const TEM_SECCIONES = [
@@ -38,7 +39,7 @@ const TEM_SECCIONES = [
     {cod: "AG21", nombre: "Aula de Apoyo"},
     {cod: "?4",   nombre: "Aula de Apoyo (Orientación)"},
     {cod: "ADA1", nombre: "Aula Convivencia"},
-    {cod: "AV1",  nombre: "Audiovisuales · Tutoría"},
+    {cod: "AV1",  nombre: "Audiovisuales · Tutoría", equipos: ["PROF", "SMART", "PROYECTOR", "SONIDO"]},
     {cod: "?2",   nombre: "Aula Taller"},
   ]},
   {nivel: "Laboratorios", aulas: [
@@ -50,6 +51,11 @@ const TEM_SECCIONES = [
 const TEM_EQUIPOS = [
   {id: "PROF",  nombre: "Ordenador del profesorado", img: "img/pc-profesorado.png"},
   {id: "SMART", nombre: "Pantalla SMART",            img: "img/pizarra-smart.png"},
+  {id: "PROYECTOR", nombre: "Proyector Optoma",       img: "img/proyector-optoma.png", corto: "Proyector"},
+  {id: "SONIDO",    nombre: "Equipo de sonido",       img: "img/1795775270665_image.png", corto: "Sonido", mics: 6},
 ];
+const TEM_BASE = ["PROF", "SMART"];
+/* Equipos que tiene un aula concreta */
+function temEquiposDe(a){ return (a && a.equipos ? a.equipos : TEM_BASE).map(id => TEM_EQUIPOS.find(e => e.id === id)).filter(Boolean); }
 
 const TEM_AULAS = TEM_SECCIONES.flatMap(s => s.aulas.map(a => ({...a, nivel: s.nivel})));
