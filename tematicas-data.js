@@ -52,7 +52,11 @@ const TEM_EQUIPOS = [
   {id: "SMART", nombre: "Pantalla SMART",            img: "img/pizarra-smart.png"},
   {id: "PROYECTOR", nombre: "Proyector Optoma",       img: "img/proyector-optoma.png", corto: "Proyector"},
   {id: "SONIDO",    nombre: "Equipo de sonido",       img: "img/1795775270665_image.png", corto: "Sonido", mics: 6},
+  {id: "ALTAVOZ",   nombre: "Altavoces",              img: "img/altavoz.png", corto: "Altavoces"},
+  {id: "PORTATILES",nombre: "Portátiles HP",          img: "img/portatil-hp.svg", corto: "Portátiles", subs: 18},
 ];
+/* Número de fichas que cuenta un equipo en los totales (los portátiles cuentan uno a uno; los micrófonos van dentro del equipo de sonido) */
+function temPeso(e){ return e.subs || 1; }
 const TEM_BASE = ["PROF", "SMART"];
 /* Equipos que tiene un aula concreta */
 function temEquiposDe(a){ return (a && a.equipos ? a.equipos : TEM_BASE).map(id => TEM_EQUIPOS.find(e => e.id === id)).filter(Boolean); }
@@ -60,5 +64,10 @@ function temEquiposDe(a){ return (a && a.equipos ? a.equipos : TEM_BASE).map(id 
 /* Aulas que usan esta misma ficha pero tienen tarjeta propia en la portada (fuera de Aulas Temáticas) */
 const TEM_APARTE = [
   {cod: "AV1", nombre: "Audiovisuales · Tutoría", nivel: "Aula de Audiovisuales", aparte: true, equipos: ["PROF", "PROYECTOR", "SONIDO"]},
+  {cod: "PLA", nombre: "Aula de Plástica",  nivel: "Aula de Plástica",  aparte: true, equipos: ["PROF", "PROYECTOR"]},
+  {cod: "MUS", nombre: "Aula de Música",    nivel: "Aula de Música",    aparte: true, equipos: ["PROF", "PROYECTOR", "ALTAVOZ"]},
+  {cod: "MKT", nombre: "Aula de Marketing", nivel: "Aula de Marketing", aparte: true, equipos: ["PROF", "SMART", "PORTATILES"]},
 ];
+/* Prefijos de las fichas de las aulas con tarjeta propia (para no sumarlas en Aulas Temáticas) */
+const TEM_APARTE_PREF = TEM_APARTE.map(a => a.cod + "-");
 const TEM_AULAS = [...TEM_SECCIONES.flatMap(s => s.aulas.map(a => ({...a, nivel: s.nivel}))), ...TEM_APARTE];

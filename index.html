@@ -131,13 +131,22 @@ const AULAS = [
   {file: "aula-tematica.html?a=AV1", id: "av1", title: "Aula de <em>Audiovisuales</em>", key: "tematicas-estado-v1", prefix: "AV1-", total: 3,
    pics: ["img/proyector-optoma.png", "img/1795775270665_image.png"],
    desc: "Ordenador del profesorado, proyector Optoma y equipo de sonido Denon con 6 micrófonos."},
+  {file: "aula-tematica.html?a=PLA", id: "pla", video: "aula-plastica", title: "Aula de <em>Plástica</em>", key: "tematicas-estado-v1", prefix: "PLA-", total: 2,
+   desc: "Ordenador del profesorado y proyector Optoma."},
+  {file: "aula-tematica.html?a=MUS", id: "mus", video: "aula-musica", title: "Aula de <em>Música</em>", key: "tematicas-estado-v1", prefix: "MUS-", total: 3,
+   desc: "Ordenador del profesorado, proyector Optoma y altavoces."},
+  {file: "aula-tematica.html?a=MKT", id: "mkt", video: "aula-marketing", title: "Aula de <em>Marketing</em>", key: "tematicas-estado-v1", prefix: "MKT-", total: 20,
+   desc: "Ordenador del profesorado, pantalla SMART y 18 portátiles HP."},
 ];
+/* Prefijos de las aulas con tarjeta propia que comparten la hoja de las aulas temáticas */
+const APARTE_PREF = AULAS.filter(a => a.prefix).map(a => a.prefix);
 
 /* Cuenta los estados de un aula (si lleva prefix, solo las fichas de esa aula dentro de una hoja compartida) */
 function countOf(a){
   const c = {ok: 0, warn: 0, bad: 0};
   Object.entries(readState(a.key)).forEach(([id, v]) => {
     if (id === "ARMARIO" || (a.prefix && !id.startsWith(a.prefix))) return;
+    if (v && v.subs) { Object.values(v.subs).forEach(st => { if (c[st] !== undefined) c[st]++; }); return; } // portátiles: cuenta cada uno
     if (v && c[v.st] !== undefined) c[v.st]++;
   });
   return c;
@@ -156,7 +165,7 @@ AULAS.forEach(a => {
   card.className = "card"; card.href = a.file + (a.file.includes("?") ? "&" : "?") + "v=3"; card.dataset.key = a.id || a.key;
   const media = a.pics
     ? `<div class="pics">${a.pics.map(p => `<img src="${p}" alt="">`).join("")}</div>`
-    : `<video src="video/${a.file.replace('.html', '.mp4')}?v=3" poster="img/${a.file.replace('.html', '.jpg')}?v=3" preload="metadata" playsinline loop muted></video>
+    : `<video src="video/${a.video || a.file.replace('.html', '')}.mp4?v=3" poster="img/${a.video || a.file.replace('.html', '')}.jpg?v=3" preload="metadata" playsinline loop muted></video>
       <span class="play">▶ Pasa el ratón para verlo</span>`;
   card.innerHTML = `
     <div class="thumb${a.pics ? " pics-thumb" : ""}">
@@ -194,7 +203,7 @@ function paintCounts(){
 /* Contadores de la sección Aulas Temáticas */
 function paintTem(){
   const c = {ok: 0, warn: 0, bad: 0};
-  Object.entries(readState("tematicas-estado-v1")).forEach(([id, v]) => { if (!id.startsWith("AV1-") && v && c[v.st] !== undefined) c[v.st]++; });
+  Object.entries(readState("tematicas-estado-v1")).forEach(([id, v]) => { if (!APARTE_PREF.some(p => id.startsWith(p)) && v && c[v.st] !== undefined) c[v.st]++; });
   temOk.textContent = c.ok; temWarn.textContent = c.warn; temBad.textContent = c.bad;
   temProbs.textContent = c.warn + c.bad; temAlert.classList.toggle("show", c.warn + c.bad > 0);
 }

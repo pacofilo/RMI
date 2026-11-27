@@ -1,14 +1,16 @@
 /* RMI · service worker: permite abrir la app sin conexión.
    Primero intenta la red (así siempre ves la última versión) y, si no hay conexión, usa la copia guardada.
    Los vídeos no se guardan, porque ocupan mucho. */
-const CACHE = "rmi-v11";
+const CACHE = "rmi-v12";
 const PAGES = ["./", "./index.html", "./aula-infortec.html", "./aula-multimedia.html", "./sala-profesorado.html",
                "./aula-edit.html", "./ciclo-i.html", "./ciclo-ii.html",
                "./aulas-tematicas.html", "./aula-tematica.html", "./tematicas-data.js",
                "./img/pc-profesorado.png", "./img/pizarra-smart.png", "./img/proyector-optoma.png", "./manifest.json", "./rmi-sync.js",
                "./icons/icon-192.png", "./icons/icon-512.png",
                "./img/aula-infortec.jpg", "./img/aula-multimedia.jpg", "./img/sala-profesorado.jpg",
-               "./img/aula-edit.jpg", "./img/ciclo-i.jpg", "./img/ciclo-ii.jpg"];
+               "./img/aula-edit.jpg", "./img/ciclo-i.jpg", "./img/ciclo-ii.jpg",
+               "./img/aula-plastica.jpg", "./img/aula-musica.jpg", "./img/aula-marketing.jpg",
+               "./img/altavoz.png", "./img/portatil-hp.svg", "./img/1795775270665_image.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.all(PAGES.map(u => c.add(u).catch(() => {})))));
