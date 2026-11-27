@@ -11,7 +11,6 @@ const TEM_SECCIONES = [
   {nivel: "2º ESO", aulas: [
     {cod: "AG5", nombre: "Aula 2º A"},
     {cod: "AG6", nombre: "Aula 2º B"},
-    {cod: "AG4", nombre: "Aula 2º C"},
   ]},
   {nivel: "3º ESO", aulas: [
     {cod: "AG8",  nombre: "Aula 3º A"},
@@ -21,10 +20,10 @@ const TEM_SECCIONES = [
   {nivel: "4º ESO", aulas: [
     {cod: "AG10", nombre: "Aula 4º A"},
     {cod: "AG11", nombre: "Aula 4º B"},
-    {cod: "AG13", nombre: "Aula 1º HCS · 4º DIVER"},
   ]},
   {nivel: "1º Bachillerato", aulas: [
     {cod: "AG19", nombre: "Aula 1º CIT"},
+    {cod: "AG13", nombre: "Aula 1º HCS"},
   ]},
   {nivel: "2º Bachillerato", aulas: [
     {cod: "AG14", nombre: "Aula 2º CIT"},
@@ -32,12 +31,9 @@ const TEM_SECCIONES = [
   ]},
   {nivel: "Formación Profesional", aulas: [
     {cod: "AG18", nombre: "Aula de FPB"},
-    {cod: "AG16", nombre: "Aula de Ciclo Formativo G. M."},
-    {cod: "AG17", nombre: "Aula Ciclo Formativo II"},
     {cod: "AG12", nombre: "Aula 2º Grado Superior"},
   ]},
   {nivel: "Otras aulas", aulas: [
-    {cod: "AG7",  nombre: "Aula EDIT"},
     {cod: "AG21", nombre: "Aula de Apoyo"},
     {cod: "ADA1", nombre: "Aula Convivencia"},
     {cod: "AV1",  nombre: "Audiovisuales · Tutoría"},
