@@ -33,6 +33,7 @@ const TEM_SECCIONES = [
   {nivel: "Formación Profesional", aulas: [
     {cod: "AG18", nombre: "Aula de FPB"},
     {cod: "AG12", nombre: "Aula 2º Grado Superior"},
+    {cod: "?3",   nombre: "Aula de Comercio"},
   ]},
   {nivel: "Otras aulas", aulas: [
     {cod: "AG21", nombre: "Aula de Apoyo"},
