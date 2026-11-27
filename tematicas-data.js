@@ -6,7 +6,6 @@ const TEM_SECCIONES = [
   {nivel: "1º ESO", aulas: [
     {cod: "AG1", nombre: "Aula 1º A"},
     {cod: "AG2", nombre: "Aula 1º B"},
-    {cod: "AG3", nombre: "Aula 1º C"},
   ]},
   {nivel: "2º ESO", aulas: [
     {cod: "AG5", nombre: "Aula 2º A"},
@@ -37,6 +36,7 @@ const TEM_SECCIONES = [
   ]},
   {nivel: "Otras aulas", aulas: [
     {cod: "AG21", nombre: "Aula de Apoyo"},
+    {cod: "?4",   nombre: "Aula de Apoyo (Orientación)"},
     {cod: "ADA1", nombre: "Aula Convivencia"},
     {cod: "AV1",  nombre: "Audiovisuales · Tutoría"},
     {cod: "?2",   nombre: "Aula Taller"},
