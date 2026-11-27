@@ -86,7 +86,7 @@
 </main>
 
 <script src="rmi-sync.js?v=2"></script>
-<script src="tematicas-data.js?v=4"></script>
+<script src="tematicas-data.js?v=5"></script>
 <script>
 function readState(){ try { return JSON.parse(localStorage.getItem(TEM_KEY)) || {}; } catch (e) { return {}; } }
 const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -105,7 +105,7 @@ TEM_SECCIONES.forEach(sec => {
     c.className = "aula"; c.href = "aula-tematica.html?a=" + encodeURIComponent(a.cod); c.dataset.cod = a.cod;
     c.innerHTML = `<span class="cod">${a.cod}</span><span class="alert">⚠ Problemas</span>
       <h3>${fancy(a.nombre)}</h3>
-      <div class="equipos">${TEM_EQUIPOS.map(e => `<span><span class="dot" data-eq="${e.id}"></span>${e.id === "PROF" ? "Ordenador" : "SMART"}</span>`).join("")}</div>
+      <div class="equipos">${temEquiposDe(a).map(e => `<span><span class="dot" data-eq="${e.id}"></span>${e.corto || (e.id === "PROF" ? "Ordenador" : "SMART")}</span>`).join("")}</div>
       <div class="go">Entrar en el aula →</div>`;
     g.appendChild(c);
   });
@@ -116,7 +116,7 @@ function paint(){
   const d = readState(), T = {ok: 0, warn: 0, bad: 0};
   document.querySelectorAll(".aula").forEach(c => {
     let probs = 0;
-    TEM_EQUIPOS.forEach(e => {
+    temEquiposDe(TEM_AULAS.find(a => a.cod === c.dataset.cod)).forEach(e => {
       const st = (d[c.dataset.cod + "-" + e.id] || {}).st || "none";
       c.querySelector(`[data-eq="${e.id}"]`).className = "dot d-" + st;
       if (T[st] !== undefined) T[st]++;
@@ -125,7 +125,7 @@ function paint(){
     c.querySelector(".alert").classList.toggle("show", probs > 0);
   });
   tOk.textContent = T.ok; tWarn.textContent = T.warn; tBad.textContent = T.bad;
-  tTotal.textContent = TEM_AULAS.length * TEM_EQUIPOS.length;
+  tTotal.textContent = TEM_AULAS.reduce((n, a) => n + temEquiposDe(a).length, 0);
 }
 paint();
 RMISync.pullAll([TEM_KEY], paint);
