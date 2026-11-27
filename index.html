@@ -51,6 +51,10 @@
   .sound{position:fixed;top:1rem;right:1rem;z-index:20;font-family:inherit;font-size:.88rem;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:.5rem 1rem;cursor:pointer;box-shadow:0 2px 10px rgba(60,40,10,.12);display:flex;align-items:center;gap:.45rem}
   .sound:hover{background:var(--paper2)}
   .sound.off{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .pics-thumb{background:linear-gradient(160deg,#fbf6ec,#ebdfc6);display:flex;align-items:center;justify-content:center}
+  .pics{display:flex;align-items:center;justify-content:center;gap:1.2rem;width:100%;height:100%;padding:1.4rem}
+  .pics img{max-width:46%;max-height:80%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(60,40,10,.3));transition:transform .4s ease}
+  .card:hover .pics img{transform:scale(1.05)}
   .badge{position:absolute;top:.7rem;left:.7rem;background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.2rem .7rem}
   .alert{position:absolute;top:.7rem;right:.7rem;background:var(--bad);color:#fff;font-size:.75rem;font-weight:700;border-radius:999px;padding:.2rem .7rem;display:none;box-shadow:0 2px 8px rgba(0,0,0,.2)}
   .alert.show{display:block}
@@ -99,7 +103,7 @@
     <div class="tem-imgs"><img src="img/pc-profesorado.png" alt=""><img src="img/pizarra-smart.png" alt=""></div>
     <div>
       <h2>Aulas <em>Temáticas</em></h2>
-      <p>25 aulas y laboratorios, ordenados por cursos: ordenador del profesorado y pantalla SMART de cada una.</p>
+      <p>24 aulas y laboratorios, ordenados por cursos: ordenador del profesorado y pantalla SMART de cada una.</p>
       <div class="mini">
         <span><span class="dot d-ok"></span><i id="temOk">0</i> funcionan</span>
         <span><span class="dot d-warn"></span><i id="temWarn">0</i> con incidencias</span>
@@ -126,8 +130,20 @@ const AULAS = [
    desc: "21 ordenadores, ordenador del profesorado y pizarra SMART."},
   {file: "ciclo-ii.html",        title: "Ciclo <em>II</em>",           key: "ciclo2-estado-v1",     total: 14,
    desc: "12 ordenadores, ordenador del profesorado y proyector Optoma."},
+  {file: "aula-tematica.html?a=AV1", id: "av1", title: "Aula de <em>Audiovisuales</em>", key: "tematicas-estado-v1", prefix: "AV1-", total: 3,
+   pics: ["img/proyector-optoma.png", "img/1795775270665_image.png"],
+   desc: "Ordenador del profesorado, proyector Optoma y equipo de sonido Denon con 6 micrófonos."},
 ];
 
+/* Cuenta los estados de un aula (si lleva prefix, solo las fichas de esa aula dentro de una hoja compartida) */
+function countOf(a){
+  const c = {ok: 0, warn: 0, bad: 0};
+  Object.entries(readState(a.key)).forEach(([id, v]) => {
+    if (id === "ARMARIO" || (a.prefix && !id.startsWith(a.prefix))) return;
+    if (v && c[v.st] !== undefined) c[v.st]++;
+  });
+  return c;
+}
 function readState(key){
   try { return JSON.parse(localStorage.getItem(key)) || {}; } catch (e) { return {}; }
 }
@@ -135,17 +151,18 @@ function readState(key){
 const grid = document.getElementById("grid");
 const T = {ok: 0, warn: 0, bad: 0, total: 0};
 AULAS.forEach(a => {
-  const d = readState(a.key);
-  const c = {ok: 0, warn: 0, bad: 0};
-  Object.entries(d).forEach(([id, v]) => { if (id !== "ARMARIO" && v && c[v.st] !== undefined) c[v.st]++; });
+  const c = countOf(a);
   T.ok += c.ok; T.warn += c.warn; T.bad += c.bad; T.total += a.total;
   const probs = c.warn + c.bad;
   const card = document.createElement("a");
-  card.className = "card"; card.href = a.file + "?v=3"; card.dataset.key = a.key;
+  card.className = "card"; card.href = a.file + (a.file.includes("?") ? "&" : "?") + "v=3"; card.dataset.key = a.id || a.key;
+  const media = a.pics
+    ? `<div class="pics">${a.pics.map(p => `<img src="${p}" alt="">`).join("")}</div>`
+    : `<video src="video/${a.file.replace('.html', '.mp4')}?v=3" poster="img/${a.file.replace('.html', '.jpg')}?v=3" preload="metadata" playsinline loop muted></video>
+      <span class="play">▶ Pasa el ratón para verlo</span>`;
   card.innerHTML = `
-    <div class="thumb">
-      <video src="video/${a.file.replace('.html', '.mp4')}?v=3" poster="img/${a.file.replace('.html', '.jpg')}?v=3" preload="metadata" playsinline loop muted></video>
-      <span class="play">▶ Pasa el ratón para verlo</span>
+    <div class="thumb${a.pics ? " pics-thumb" : ""}">
+      ${media}
       <span class="badge">${a.total} equipos</span>
       <span class="alert ${probs ? "show" : ""}">⚠ <i class="n-probs">${probs}</i> con problemas</span>
     </div>
@@ -167,10 +184,9 @@ tOk.textContent = T.ok; tWarn.textContent = T.warn; tBad.textContent = T.bad; tT
 function paintCounts(){
   const S = {ok: 0, warn: 0, bad: 0};
   AULAS.forEach(a => {
-    const c = {ok: 0, warn: 0, bad: 0};
-    Object.entries(readState(a.key)).forEach(([id, v]) => { if (id !== "ARMARIO" && v && c[v.st] !== undefined) c[v.st]++; });
+    const c = countOf(a);
     S.ok += c.ok; S.warn += c.warn; S.bad += c.bad;
-    const card = grid.querySelector(`.card[data-key="${a.key}"]`);
+    const card = grid.querySelector(`.card[data-key="${a.id || a.key}"]`);
     card.querySelector(".n-ok").textContent = c.ok; card.querySelector(".n-warn").textContent = c.warn;
     card.querySelector(".n-bad").textContent = c.bad; card.querySelector(".n-probs").textContent = c.warn + c.bad;
     card.querySelector(".alert").classList.toggle("show", c.warn + c.bad > 0);
@@ -180,12 +196,12 @@ function paintCounts(){
 /* Contadores de la sección Aulas Temáticas */
 function paintTem(){
   const c = {ok: 0, warn: 0, bad: 0};
-  Object.values(readState("tematicas-estado-v1")).forEach(v => { if (v && c[v.st] !== undefined) c[v.st]++; });
+  Object.entries(readState("tematicas-estado-v1")).forEach(([id, v]) => { if (!id.startsWith("AV1-") && v && c[v.st] !== undefined) c[v.st]++; });
   temOk.textContent = c.ok; temWarn.textContent = c.warn; temBad.textContent = c.bad;
   temProbs.textContent = c.warn + c.bad; temAlert.classList.toggle("show", c.warn + c.bad > 0);
 }
 paintTem();
-const ALL_KEYS = [...AULAS.map(a => a.key), "tematicas-estado-v1"];
+const ALL_KEYS = [...new Set([...AULAS.map(a => a.key), "tematicas-estado-v1"])];
 const repaint = () => { paintCounts(); paintTem(); };
 if (typeof RMISync !== "undefined") {   // si falta rmi-sync.js la portada se sigue viendo, solo con los datos locales
   RMISync.pullAll(ALL_KEYS, repaint);
@@ -218,6 +234,7 @@ btnSound.addEventListener("click", () => {
 paintSound();
 document.querySelectorAll(".card").forEach(card => {
   const v = card.querySelector("video");
+  if (!v) return;                     // tarjetas con fotos en lugar de vídeo
   card.addEventListener("mouseenter", () => playVideo(v));
   card.addEventListener("mouseleave", () => stopVideo(v));
   card.querySelector(".thumb").addEventListener("click", () => { window.location.href = card.href; }); // pinchar en el vídeo entra en el aula

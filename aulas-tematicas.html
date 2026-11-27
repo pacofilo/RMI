@@ -86,7 +86,7 @@
 </main>
 
 <script src="rmi-sync.js?v=2"></script>
-<script src="tematicas-data.js?v=5"></script>
+<script src="tematicas-data.js?v=6"></script>
 <script>
 function readState(){ try { return JSON.parse(localStorage.getItem(TEM_KEY)) || {}; } catch (e) { return {}; } }
 const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -125,7 +125,7 @@ function paint(){
     c.querySelector(".alert").classList.toggle("show", probs > 0);
   });
   tOk.textContent = T.ok; tWarn.textContent = T.warn; tBad.textContent = T.bad;
-  tTotal.textContent = TEM_AULAS.reduce((n, a) => n + temEquiposDe(a).length, 0);
+  tTotal.textContent = TEM_AULAS.filter(a => !a.aparte).reduce((n, a) => n + temEquiposDe(a).length, 0);
 }
 paint();
 RMISync.pullAll([TEM_KEY], paint);

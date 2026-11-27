@@ -1,7 +1,7 @@
 /* RMI · service worker: permite abrir la app sin conexión.
    Primero intenta la red (así siempre ves la última versión) y, si no hay conexión, usa la copia guardada.
    Los vídeos no se guardan, porque ocupan mucho. */
-const CACHE = "rmi-v10";
+const CACHE = "rmi-v11";
 const PAGES = ["./", "./index.html", "./aula-infortec.html", "./aula-multimedia.html", "./sala-profesorado.html",
                "./aula-edit.html", "./ciclo-i.html", "./ciclo-ii.html",
                "./aulas-tematicas.html", "./aula-tematica.html", "./tematicas-data.js",

@@ -39,7 +39,6 @@ const TEM_SECCIONES = [
     {cod: "AG21", nombre: "Aula de Apoyo"},
     {cod: "?4",   nombre: "Aula de Apoyo (Orientación)"},
     {cod: "ADA1", nombre: "Aula Convivencia"},
-    {cod: "AV1",  nombre: "Audiovisuales · Tutoría", equipos: ["PROF", "PROYECTOR", "SONIDO"]},
     {cod: "?2",   nombre: "Aula Taller"},
   ]},
   {nivel: "Laboratorios", aulas: [
@@ -58,4 +57,8 @@ const TEM_BASE = ["PROF", "SMART"];
 /* Equipos que tiene un aula concreta */
 function temEquiposDe(a){ return (a && a.equipos ? a.equipos : TEM_BASE).map(id => TEM_EQUIPOS.find(e => e.id === id)).filter(Boolean); }
 
-const TEM_AULAS = TEM_SECCIONES.flatMap(s => s.aulas.map(a => ({...a, nivel: s.nivel})));
+/* Aulas que usan esta misma ficha pero tienen tarjeta propia en la portada (fuera de Aulas Temáticas) */
+const TEM_APARTE = [
+  {cod: "AV1", nombre: "Audiovisuales · Tutoría", nivel: "Aula de Audiovisuales", aparte: true, equipos: ["PROF", "PROYECTOR", "SONIDO"]},
+];
+const TEM_AULAS = [...TEM_SECCIONES.flatMap(s => s.aulas.map(a => ({...a, nivel: s.nivel}))), ...TEM_APARTE];

@@ -110,7 +110,7 @@
 </head>
 <body>
 <header>
-  <a class="volver" href="aulas-tematicas.html">← Volver a Aulas Temáticas</a>
+  <a class="volver" id="volver" href="aulas-tematicas.html">← Volver a Aulas Temáticas</a>
   <div class="eyebrow" id="nivel">Aulas temáticas</div>
   <span class="cod" id="cod"></span>
   <h1 id="titulo">Aula</h1>
@@ -160,7 +160,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="rmi-sync.js?v=2"></script>
-<script src="tematicas-data.js?v=5"></script>
+<script src="tematicas-data.js?v=6"></script>
 <script>
 const COD = (new URLSearchParams(location.search).get("a") || "").toUpperCase();
 const AULA = TEM_AULAS.find(a => a.cod === COD);
@@ -181,7 +181,8 @@ if (!AULA) {
   devs.outerHTML = '<p class="noexiste">No se ha encontrado esa aula. Vuelve a <a href="aulas-tematicas.html">Aulas Temáticas</a> y elige una.</p>';
 } else {
   document.title = AULA.cod + " · " + AULA.nombre + " · RMI";
-  nivel.textContent = "Aulas temáticas · " + AULA.nivel;
+  nivel.textContent = AULA.aparte ? "RMI · " + AULA.nivel : "Aulas temáticas · " + AULA.nivel;
+  if (AULA.aparte) { volver.href = "index.html"; volver.textContent = "← Volver a RMI"; }
   cod.textContent = AULA.cod;
   titulo.innerHTML = AULA.nombre.replace(/^(Aula de |Aula |Laboratorio de )(.+)$/, "$1<em>$2</em>").replace(/^([^<]+ · )(.+)$/, "$1<em>$2</em>");
   if (EQS.length > 2) { devs.classList.add("n" + EQS.length); subt.textContent = "Pincha en cada equipo para anotar si funciona bien o si presenta algún problema."; }
