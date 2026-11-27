@@ -20,6 +20,7 @@ const TEM_SECCIONES = [
   {nivel: "4º ESO", aulas: [
     {cod: "AG10", nombre: "Aula 4º A"},
     {cod: "AG11", nombre: "Aula 4º B"},
+    {cod: "?",    nombre: "Aula 4º DIVER"},
   ]},
   {nivel: "1º Bachillerato", aulas: [
     {cod: "AG19", nombre: "Aula 1º CIT"},
