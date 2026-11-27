@@ -50,6 +50,8 @@
     transition:transform .2s ease,filter .2s ease}
   .pc:hover,.pc:focus-visible{transform:translate(-50%,-50%) scale(1.15);z-index:5;outline:none;filter:drop-shadow(0 4px 6px rgba(60,40,10,.3))}
   .pc img{width:100%;display:block;pointer-events:none}
+  .pc.dev{width:calc(var(--pcw,7.6%) * var(--k,1))}
+  .pc.dev img{filter:drop-shadow(0 2px 3px rgba(60,40,10,.25))}
   .pc .num{position:absolute;left:50%;bottom:-.15em;transform:translate(-50%,50%);font-size:max(9px,calc(var(--pcw,60px)*.17));font-weight:700;
     background:var(--card);border:2px solid var(--none);border-radius:999px;padding:0 .45em;line-height:1.4;color:var(--ink);white-space:nowrap}
   .pc .flag{position:absolute;top:-6%;right:-4%;width:max(8px,calc(var(--pcw,60px)*.16));height:max(8px,calc(var(--pcw,60px)*.16));border-radius:50%;border:2px solid #fff;background:var(--none);box-shadow:0 1px 3px rgba(0,0,0,.25)}
@@ -204,6 +206,8 @@ spread(MID - 2.5 * 82, MID + 2.5 * 82, 6).forEach(y => PCS.push({id: n, x: 330, 
 [560, 690, 820].forEach(x => PCS.push({id: n, x, y: TOP_Y, num: n++}));              // fila superior (3)
 for (let r = 0; r < 12; r++) PCS.push({id: n, x: 890, y: R0 + r * PITCH, num: n++}); // derecha (12)
 PCS.push({id: "P", x: 500, y: 890, num: "Profesor"});                                // profesor (centrado)
+PCS.push({id: "PROY", x: 500, y: 770, num: "Proyector", type: "proyector", k: 1.25});  // proyector Optoma, delante de la mesa
+const IMG = {pc: PC_SRC, proyector: "img/proyector-optoma.png"};
 
 const WALLS = [
   {x: 150, y: TOP_Y - 38, w: 7, h: R_END - TOP_Y + 76},                     // pared tras columna izquierda
@@ -221,7 +225,8 @@ function persist(){ try { localStorage.setItem(KEY, JSON.stringify(data)); } cat
 const SYNC = RMISync.attach(KEY, () => data, d => { data = d; try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} refresh(); });
 
 const pct = (v, total) => (v / total * 100) + "%";
-const nameOf = id => id === "P" ? "Puesto del profesor" : "Ordenador " + String(id).padStart(2, "0");
+const nameOf = id => id === "P" ? "Puesto del profesor" : id === "PROY" ? "Proyector Optoma" : "Ordenador " + String(id).padStart(2, "0");
+const typeOf = id => (PCS.find(p => p.id == id) || {}).type || "pc";
 
 /* ---------- Dibujar el plano ---------- */
 const room = document.getElementById("room");
@@ -238,10 +243,11 @@ Object.assign(tag.style, {left: pct(MESA.x+MESA.w/2,1000), top: pct(MESA.y-20,H)
 
 PCS.forEach(pc => {
   const b = document.createElement("button");
-  b.className = "pc"; b.dataset.id = pc.id;
+  b.className = "pc" + (pc.type ? " dev" : ""); b.dataset.id = pc.id;
   b.style.left = pct(pc.x,1000); b.style.top = pct(pc.y,H);
+  if (pc.k) b.style.setProperty("--k", pc.k);
   b.setAttribute("aria-label", nameOf(pc.id));
-  b.innerHTML = `<img src="${PC_SRC}" alt=""><span class="flag"></span><span class="num">${pc.num}</span>`;
+  b.innerHTML = `<img src="${IMG[pc.type || "pc"]}" alt=""><span class="flag"></span><span class="num">${pc.num}</span>`;
   b.addEventListener("click", () => openModal(pc.id));
   room.appendChild(b);
 });
@@ -275,20 +281,24 @@ function refresh(){
 }
 
 /* ---------- Ventana ---------- */
+const QUICK_PROY = ["No enciende","No se ve la imagen","Imagen borrosa","Colores raros","Aviso de lámpara / lámpara fundida","Se apaga solo","El mando no funciona","No conecta con el ordenador (HDMI/VGA)","Ventilador hace mucho ruido"];
 const QUICK = ["No enciende torre","Pantalla sin señal","Falta ratón","Falta teclado","Faltan teclas","Ratón no funciona","Teclado no funciona","Sin Internet","Va muy lento","No inicia sesión","Problema de sonido","Problema de espacio en disco duro"];
 let current = null;
 const overlay = document.getElementById("overlay");
-QUICK.forEach(q => {
-  const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.textContent = "+ " + q;
-  b.onclick = () => { const t = mNote.value.trim(); mNote.value = (t ? t + "\n" : "") + "• " + q;
-    if (!document.querySelector('input[name=st]:checked')) document.getElementById(q === "No enciende torre" ? "st-bad" : "st-warn").checked = true;
-    mNote.focus(); };
-  quick.appendChild(b);
-});
+function buildQuick(id){
+  quick.innerHTML = "";
+  (typeOf(id) === "proyector" ? QUICK_PROY : QUICK).forEach(q => {
+    const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.textContent = "+ " + q;
+    b.onclick = () => { const t = mNote.value.trim(); mNote.value = (t ? t + "\n" : "") + "• " + q;
+      if (!document.querySelector('input[name=st]:checked')) document.getElementById(/^No enciende/.test(q) ? "st-bad" : "st-warn").checked = true;
+      mNote.focus(); };
+    quick.appendChild(b);
+  });
+}
 
 function openModal(id){
   current = id; const d = data[id] || {};
-  mTitle.textContent = nameOf(id);
+  mTitle.textContent = nameOf(id); buildQuick(id);
   document.querySelectorAll('input[name=st]').forEach(r => r.checked = r.value === d.st);
   mNote.value = d.note || ""; mWho.value = d.who || localStorageGet("infortec-who");
   mMeta.textContent = d.date ? "Última actualización: " + d.date : "Este equipo aún no tiene anotaciones.";
