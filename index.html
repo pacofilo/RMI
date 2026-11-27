@@ -63,6 +63,18 @@
   .go{margin-top:auto;padding-top:.6rem;font-weight:700;color:var(--accent);font-size:.92rem}
   .card:hover .go{text-decoration:underline}
   .note{text-align:center;color:var(--ink2);font-size:.8rem;margin-top:2rem}
+  .tem{display:flex;align-items:center;gap:1.6rem;margin:2.4rem 0 0;padding:1.8rem 2rem;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:22px;
+    box-shadow:0 6px 24px rgba(60,40,10,.08);position:relative;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease}
+  .tem::before{content:"";position:absolute;inset:0 auto 0 0;width:8px;background:var(--accent)}
+  .tem:hover{transform:translateY(-5px);box-shadow:0 14px 34px rgba(60,40,10,.16)}
+  .tem-imgs{display:flex;gap:.4rem;flex:none}
+  .tem-imgs img{width:110px;filter:drop-shadow(0 4px 6px rgba(60,40,10,.25))}
+  .tem h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:clamp(2.4rem,5vw,3.4rem);line-height:1}
+  .tem h2 em{color:var(--accent)}
+  .tem p{color:var(--ink2);font-size:.95rem;margin:.3rem 0 .5rem}
+  .tem .go{padding-top:0}
+  .tem .alert{top:1rem;right:1rem}
+  @media (max-width:640px){.tem{flex-direction:column;text-align:center;padding:1.4rem}.tem-imgs img{width:90px}}
 </style>
 </head>
 <body>
@@ -83,6 +95,20 @@
     <div class="stat"><span class="dot d-none"></span><b id="tTotal">0</b><span>Equipos en total</span></div>
   </div>
   <div class="grid" id="grid"></div>
+  <a class="tem" href="aulas-tematicas.html">
+    <div class="tem-imgs"><img src="img/pc-profesorado.png" alt=""><img src="img/pizarra-smart.png" alt=""></div>
+    <div>
+      <h2>Aulas <em>Temáticas</em></h2>
+      <p>25 aulas y laboratorios, ordenados por cursos: ordenador del profesorado y pantalla SMART de cada una.</p>
+      <div class="mini">
+        <span><span class="dot d-ok"></span><i id="temOk">0</i> funcionan</span>
+        <span><span class="dot d-warn"></span><i id="temWarn">0</i> con incidencias</span>
+        <span><span class="dot d-bad"></span><i id="temBad">0</i> no funcionan</span>
+      </div>
+      <div class="go">Ver las aulas temáticas →</div>
+    </div>
+    <span class="alert" id="temAlert">⚠ <i id="temProbs">0</i> con problemas</span>
+  </a>
   <p class="note">Pasa el ratón por una tarjeta para ver su vídeo y pincha en cualquier parte de ella para entrar en el aula. Las anotaciones se guardan en la web y se comparten entre todos los dispositivos.</p>
 </main>
 
@@ -151,8 +177,20 @@ function paintCounts(){
   });
   tOk.textContent = S.ok; tWarn.textContent = S.warn; tBad.textContent = S.bad;
 }
-RMISync.pullAll(AULAS.map(a => a.key), paintCounts);
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") RMISync.pullAll(AULAS.map(a => a.key), paintCounts); });
+/* Contadores de la sección Aulas Temáticas */
+function paintTem(){
+  const c = {ok: 0, warn: 0, bad: 0};
+  Object.values(readState("tematicas-estado-v1")).forEach(v => { if (v && c[v.st] !== undefined) c[v.st]++; });
+  temOk.textContent = c.ok; temWarn.textContent = c.warn; temBad.textContent = c.bad;
+  temProbs.textContent = c.warn + c.bad; temAlert.classList.toggle("show", c.warn + c.bad > 0);
+}
+paintTem();
+const ALL_KEYS = [...AULAS.map(a => a.key), "tematicas-estado-v1"];
+const repaint = () => { paintCounts(); paintTem(); };
+if (typeof RMISync !== "undefined") {   // si falta rmi-sync.js la portada se sigue viendo, solo con los datos locales
+  RMISync.pullAll(ALL_KEYS, repaint);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") RMISync.pullAll(ALL_KEYS, repaint); });
+}
 
 /* ---------- Vídeos con sonido al pasar el ratón o pinchar ---------- */
 let soundOn = true;

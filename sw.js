@@ -1,9 +1,11 @@
 /* RMI · service worker: permite abrir la app sin conexión.
    Primero intenta la red (así siempre ves la última versión) y, si no hay conexión, usa la copia guardada.
    Los vídeos no se guardan, porque ocupan mucho. */
-const CACHE = "rmi-v3";
+const CACHE = "rmi-v4";
 const PAGES = ["./", "./index.html", "./aula-infortec.html", "./aula-multimedia.html", "./sala-profesorado.html",
-               "./aula-edit.html", "./ciclo-i.html", "./ciclo-ii.html", "./manifest.json", "./rmi-sync.js",
+               "./aula-edit.html", "./ciclo-i.html", "./ciclo-ii.html",
+               "./aulas-tematicas.html", "./aula-tematica.html", "./tematicas-data.js",
+               "./img/pc-profesorado.png", "./img/pizarra-smart.png", "./manifest.json", "./rmi-sync.js",
                "./icons/icon-192.png", "./icons/icon-512.png",
                "./img/aula-infortec.jpg", "./img/aula-multimedia.jpg", "./img/sala-profesorado.jpg",
                "./img/aula-edit.jpg", "./img/ciclo-i.jpg", "./img/ciclo-ii.jpg"];
