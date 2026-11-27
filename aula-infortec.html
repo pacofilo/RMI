@@ -206,7 +206,7 @@ spread(MID - 2.5 * 82, MID + 2.5 * 82, 6).forEach(y => PCS.push({id: n, x: 330, 
 [560, 690, 820].forEach(x => PCS.push({id: n, x, y: TOP_Y, num: n++}));              // fila superior (3)
 for (let r = 0; r < 12; r++) PCS.push({id: n, x: 890, y: R0 + r * PITCH, num: n++}); // derecha (12)
 PCS.push({id: "P", x: 500, y: 890, num: "Profesor"});                                // profesor (centrado)
-PCS.push({id: "PROY", x: 500, y: 770, num: "Proyector", type: "proyector", k: 1.25});  // proyector Optoma, delante de la mesa
+PCS.push({id: "PROY", x: 500, y: 735, num: "Proyector", type: "proyector", k: 1.25});  // proyector Optoma, delante de la mesa
 const IMG = {pc: PC_SRC, proyector: "img/proyector-optoma.png"};
 
 const WALLS = [
